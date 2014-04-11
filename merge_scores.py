@@ -5,12 +5,20 @@ import pprint
 
 def main():
 
-    if len(sys.argv) < 6:
-        print sys.argv[0] + " scores_file_1.txt scores_file_2.txt [append|replace] id poz"
+    if len(sys.argv) < 5 or len(sys.argv) > 6:
+      print sys.argv[0] + " scores_file_1.txt scores_file_2.txt [append | replace] id poz"
+      sys.exit()
+    elif sys.argv[3] == "replace":
+      if len(sys.argv) != 5:
+        print sys.argv[0] + " scores_file_1.txt scores_file_2.txt replace id"
+        sys.exit()
+    elif sys.argv[3] == "append":
+      if len(sys.argv) != 6:
+        print sys.argv[0] + " scores_file_1.txt scores_file_2.txt append id poz"
+        poz = int(sys.argv[5])
         sys.exit()
 
     id = sys.argv[4]
-    poz = int(sys.argv[5])
 
     header = open(sys.argv[1], "r").readline().strip().split("\t")
 
