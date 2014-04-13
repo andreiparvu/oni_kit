@@ -4,4 +4,87 @@ Bogdan Cristian Tataroiu, Andrei Parvu
 ONI KIT
 -------
 
+In acest kit sunt 3 (speram ca folositoare) scripturi pentru ONI.
+
+
+* add_source_files.sh
+
+Deoarece, de obicei, sursele pentru o problema sunt facute cu
+diferite denumiri (problema100.cpp, ciocolataPA.cpp, etc.), acestea
+trebuie apoi redenumite si mutate in directoare specifice in 'stud'
+(directorul cu studenti din grader).
+Acest script primeste o arhiva cu sursele facute pentru o problema,
+si testele pentru aceasta si le pune pe toate in directoarele
+corespunzatoare din grader.
+De exmplu, daca avem o problema cu id-ul 'matrix' si sursele
+aferente matrix-100-andrei.cpp, matrix-brut.cpp, matrix-100-bogdan.c,
+putem face o arhiva denumita matrix.zip, care la dezarhivare
+sa obtina un folder denumit 'matrix' cu urmatoarea structura:
+
+matrix/:
+matrix-100-andrei.cpp  matrix-100-bogdan.c  matrix-brut.cpp  teste
+
+matrix/teste:
+0-matrix.in  0-matrix.ok ...
+
+Avand aceasta arhiva, putem rula ./add_source_files.sh matrix,
+scriptul dezarhivand matrix.zip, creand directore denumite
+matrix-100-andrei, matrix-100-bogdan si matrix-brut in stud/,
+completand stud.txt, adaugand matrix in total-probs.txt si
+testele in probs/matrix.
+
+Apoi trebuie doar rulat grader-ul si toate sursele vor fi evaluate.
+
+
+
+* merge_scores.py
+
+Deoarece de multe ori a fost nevoie sa combinam mai multe fisiere
+scores.txt, acest script face acest lucru :).
+
+Acesta poate fi folosit in doua moduri:
+
+1. append
+  Coloana cu id-ul 'id' din al doilea fisier este inserat in primul
+fisier la pozitia poz. Este util cand se evalueaza diferite probleme
+pe diferite calculatoare si apoi vrem sa combinam rezultatele.
+
+2. replace
+  Coloana cu id-ul 'id' din primul fisier este inlocuita cu
+coloana cu id-ul 'id' din al doilea fisier. Este util atunci cand
+se reevalueaza o problema si dorim sa adaugam noile rezultate.
+
+
+
+* meta_makefile.py
+
+In cazul in care avem multe surse pentru o problema, ca sa nu fie
+nevoie de scrierea unor reguli de make, test si clean pentru
+fiecare, se poate folosi acest script.
+In fisierul config.json se pot adauga diferite optiuni, iar
+apoi rularea scriptului meta_makefile.py generand un Makefile asociat.
+Configurarile din config.json sunt urmatoarele:
+
+* compiler
+* clflags
+* ldflags
+* shell
+* problem_name: numele problemei pentru care se genereaza makefile-ul
+* gen_source: sursa care este considerata corecta si cu care se pot genera testele
+* test_data_file: un fisier cu optiuni pentru teste, care poate fi folosit
+la generarea acestora
+* test_gen_file: executabilul care va genera testele
+* gen_option: formatul fisierului test_data_file
+* test_count: numarul de teste
+* sources: sursele pentru care se vor genera reguli de build si de make.
+
+Spre exemplu, daca in sources avem fisirul matrix-100-andrei.cpp, atunci
+in Makefile-lul rezultat vom avea reguli pentru
+  * build: make matrix-100-andrei
+  * test: make test-matrix-100-andrei
+
+Regula de test este valabila doar daca exista un folder cu teste in directorul
+curent. In acest caz, se vor rula testele cu sursa data.
+Pentru generare de teste, avand fisierul test_data_file si executabilul
+test_gen_file se poate rula make gen-tests
 
