@@ -3,21 +3,17 @@
   "cflags": "-Wall -O2",
   "ldflags": "-lm",
   "shell": "/bin/bash",
-  "problem_name": "nikagraf",
-  "gen_source": "nikagraf-100-bogdan.cpp",
-  "test_data_file": "avarcolaci-teste",
-  "test_gen_file": "generator.py",
-  "gen_option": "simple",
-  "test_count": "20",
+  "problem_name": "patrulare",
+  "gen_source": "patrulare-100-andrei.cpp",
+  "test_gen_file": "generate",
+  "gen_option": "from_dir",
+  "test_count": "10",
   "sources":
-    ["nikagraf-100-bogdan.cpp",
-     "nikagraf-100-mihai.cpp",
-     "nikagraf-85-bogdan.cpp",
-     "nikagraf-85-bogdan-parsat.cpp",
-     "nikagraf-30-vlad-faraU1.cpp",
-     "nikagraf-30-vlad-faraU2.cpp",
-     "nikagraf-20-mihai.cpp",
-     "nikagraf-ceva-andrei-busit-lvl1.cpp",
-     "nikagraf-ceva-andrei-busit-lvl2.cpp",
-     "nikagraf-ceva-andrei-busit-lvl3.cpp"]
+    ["patrulare-100-andrei.cpp",
+     "patrulare-30-1-andrei.cpp",
+     "patrulare-30-2-andrei.cpp",
+     "patrulare-30-3-andrei.cpp",
+     "patrulare-30-brut-andrei.cpp",
+     "patrulare-10-andrei.cpp"
+     ]
 }

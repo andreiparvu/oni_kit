@@ -2,20 +2,27 @@
 
 import json
 
+makefile = open("Makefile", "w")
+
+def w(arg):
+  makefile.write(arg)
+
+def wn(arg):
+  makefile.write(arg + "\n")
+
 def main():
   config = open("config.json")
   configData = json.load(config)
 
-  makefile = open("Makefile", "w")
+  wn("CXX\t= %s" % configData["compiler"])
+  wn("CFLAGS\t= %s" % configData["cflags"])
+  wn("LDFLAGS\t= %s" % configData["ldflags"])
+  wn("\nSHELL\t= %s" % configData["shell"])
+  wn("TEST_COUNT\t=%s" % configData["test_count"])
 
-  makefile.write("CXX\t= " + configData["compiler"] + "\n")
-  makefile.write("CFLAGS\t= " + configData["cflags"] + "\n")
-  makefile.write("LDFLAGS\t= " + configData["ldflags"] + "\n")
-  makefile.write("\nSHELL\t= " + configData["shell"])
-  makefile.write("TEST_COUNT\t=" + configData["test_count"])
-  makefile.write("\n\n.PHONY: all\n")
+  wn("\n\n.PHONY: all")
 
-  makefile.write("all: ")
+  w("all: ")
   length = 0
 
   allSources = ""
@@ -24,55 +31,65 @@ def main():
     if length > 80:
       length = 0
       allSources += "\\\n\t"
-    allSources += source + " "
+    allSources += source.split(".")[0] + " "
 
-  makefile.write(allSources)
-  makefile.write("\n")
+  wn(allSources)
+  w("\n")
   for source in configData["sources"]:
     target = source.split(".")[0]
 
-    makefile.write(target + ": " + source + "\n")
-    makefile.write("\t $(CXX) $(CFLAGS) -o $@ $^ $(LDFLAGS)\n")
-    makefile.write("\n")
+    wn("%s: %s" % (target, source))
+    wn("\t $(CXX) $(CFLAGS) -o $@ $^ $(LDFLAGS)")
 
   infile = configData["problem_name"] + ".in"
   okfile =  configData["problem_name"] + ".ok"
   outfile = configData["problem_name"] + ".out"
 
-  makefile.write("""TEST_SCRIPT = \\
+  w("\n")
+
+  w("""TEST_SCRIPT = \\
 for ((i=1; $$i <= $(TEST_COUNT); i++)); do \\
+  echo "=============="; \\
   echo "Test $$i"; \\
-  cp teste/$$i-""" + infile + " " + infile + """; \\
+  cp teste/$$i-%s %s; \\
   time ./$<; \\
-  cp -a teste/$$i-""" + okfile + " " + okfile + """; \\
-  diff -wB """ + outfile + " " + okfile + """; \\
-  rm""" + okfile + """; \\
-done""")
+  cp -a teste/$$i-%s %s; \\
+  diff -qwB %s %s; \\
+  rm %s; \\
+done""" % (infile, infile, okfile, okfile, outfile, okfile, okfile))
+
+  generator = configData["test_gen_file"]
+  if configData["gen_option"] == "from_file":
+    generateCode = """\\
+  test=$$(head -n$$(($$i + 1)) %s tail -n1); \\
+  \\
+  echo "$$test" | sed 's/  */ /g' | sed 's/^ *//g' | sed 's/ *$$//g' | ./%s > infile; \\""" % \
+    (configData["test_data_file"], generator)
+  else:
+    generateCode = """\\
+  ./%s < test_config/test$$i.conf > %s;\\""" % (generator, infile)
 
   genExe = configData["gen_source"].rsplit('.', 1)[0]
-  makefile.write("\n\n")
-  makefile.write("gen-test: " + genExe + "\n")
-  makefile.write("""\t@\\
+  w("\n\n")
+  wn("gen-test: " + genExe)
+  w("""\t@\\
 for ((i=1; $$i <= $(TEST_COUNT); i++)); do \\
-  echo "Generating test $$i"; \\
-  test=$$(head -n$$(($$i + 1)) """ + configData["test_data_file"] + """ tail -n1); \\
-  \\
-  echo "$$test" | sed 's/  */ /g' | sed 's/^ *//g' | sed 's/ *$$//g' | ./""" + configData["test_gen_file"] + " > " + infile + """; \\
-  ./""" + genExe + """; \\
-  cp """ + infile + "teste/$$i-" + infile + """; \\
-  cp """ + outfile + "teste/$$i-" + okfile + """; \\
-done; \
-\
-make clean;""")
+  echo "Generating test $$i";""" +
+  generateCode + """
+  ./%s; \\
+  cp %s teste/$$i-%s; \\
+  cp %s teste/$$i-%s; \\
+done;""" % (genExe, infile, infile, outfile, okfile))
 
-  makefile.write("\n\n")
+  w("\n\n")
   for source in configData["sources"]:
     target = source.split(".")[0]
-    makefile.write("test-" + target + ": " + target + "\n")
-    makefile.write("\t$(TEST_SCRIPT)\n\n")
+    #w("test-" + target + ": " + target + "\n")
+    w("test-%s: %s\n" % (target, target))
+    w("\t$(TEST_SCRIPT)\n\n")
 
-  makefile.write("\n")
-  makefile.write("clean: " + allSources + "\n")
+  w("\n")
+  w("clean:\n\trm -f %s" % allSources)
 
 if __name__ == "__main__":
   main()
