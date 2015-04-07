@@ -11,7 +11,7 @@ fi
 
 set -e
 
-GRADER="~/Desktop/grader"
+GRADER="/home/$USER/Desktop/grader"
 
 prob_name=$1
 

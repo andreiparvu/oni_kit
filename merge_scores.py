@@ -15,9 +15,9 @@ def main():
     elif sys.argv[3] == "append":
       if len(sys.argv) != 6:
         print sys.argv[0] + " scores_file_1.txt scores_file_2.txt append id poz"
-        poz = int(sys.argv[5])
         sys.exit()
 
+    poz = int(sys.argv[5])
     id = sys.argv[4]
 
     header = open(sys.argv[1], "r").readline().strip().split("\t")
